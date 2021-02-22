@@ -113,26 +113,33 @@ class kith():
 					sizes += f'{self.size} - '
 				self.availability.append(self.in_stock)
 
-			# #CHECK FOR IN STOCK ITEMS
-			# #loop through variants of each product
-			# for variant in product['variants']:
-			# 	# self.in_stock = variant['available']
-			# 	#check to see if at least one variant in in stock so that we can post it
-			# 	#then reset self.availability so it doesn't spam
-			# 	if True in self.availability and self.name not in self.checked:
-			# 		self.availability = []
-			# 		self.in_stock = True
-			# 		for title in self.product_names:
-			# 			if title in self.name:
+			#CHECK FOR IN STOCK ITEMS
+			#loop through variants of each product
+			for variant in product['variants']:
+				# self.in_stock = variant['available']
+				#check to see if at least one variant in in stock so that we can post it
+				#then reset self.availability so it doesn't spam
+				if True in self.availability and self.name not in self.checked:
+					self.availability = []
+					self.in_stock = True
+					for title in self.product_names:
+						if title in self.name:
 							
-			# 				await self.post_webhook(self.name, self.url, self.price, self.in_stock, sizes, self.img)
-			# 				self.checked.append(product['title'])
-			# 				await asyncio.sleep(1)
+							await self.post_webhook(self.name, self.url, self.price, self.in_stock, sizes, self.img)
+							self.checked.append(product['title'])
+							
 
 			#check for restocks if item in self.checked
 			for variant in product['variants']:
 				
-				if self.name not in self.checked:
+				self.name = product['title']
+				self.url = await self.product_url(product['handle'])				
+				self.price = variant['price']
+				self.in_stock = variant['available']
+				self.sku = variant['sku']
+				self.product_id = variant['product_id']
+				
+				if self.name in self.checked:
 					
 					self.c.execute("SELECT in_stock FROM kith WHERE name = ?", (self.name,))
 					db_stock = self.c.fetchall()
@@ -142,17 +149,16 @@ class kith():
 					#check for matching sku's and matching stock
 					for s in db_sku:
 						if s[0] == self.sku:
-							print(self.sku)
+							# print(self.sku)
 							for stock in db_stock:
-								if stock[0] == 0 and self.in_stock == False:
-									print('yerrrrrr')
+								if stock[0] == 0 and self.in_stock == True and self.sku not in self.restocked:
 									self.size = variant['title']
 									await self.post_webhook(self.name, self.url, self.price, self.in_stock, self.size, self.img)
 									self.restocked.append(self.sku)
-									# print(self.restocked)
-								# elif stock[0] == 0 and self.in_stock == True and self.sku in self.restocked:
-								# 	self.restocked.remove(self.sku)
-
+								
+								elif stock[0] == 0 and self.in_stock == False and self.sku in self.restocked:
+									self.restocked.remove(self.sku)
+			await asyncio.sleep(1)
 				
 			
 							
