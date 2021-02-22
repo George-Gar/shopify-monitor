@@ -28,19 +28,26 @@ class title_output():
 				
 				#get list of tuples
 				self.c.execute("SELECT sku FROM kith")
-				sku_num = self.c.fetchall()
+				sku_db = self.c.fetchall()
+				self.c.execute("SELECT name FROM kith WHERE name = 'Kith Botanical Floral Williams III Hoodie - Nocturnal'")
+				name_db = (self.c.fetchall())
 				
 				#iterate thru list of tuple & grab value inside tuple then append 2 list
 				#compare sku to tuples within list
-				for skus in sku_num:
-					if skus[0] not in self.sku_list:
-						self.sku_list.append(skus[0])
+				#this code below can help us check for new arrivals to the site
+				for sku_tuple in sku_db:
+					if sku_tuple[0] not in self.sku_list:
+						self.sku_list.append(sku_tuple[0])
+					if sku in self.sku_list:
+						# print('yerrrrrr')
+						return
 				#print(len(self.sku_list))
 				
 
 				#test id's against database to find new products to monitor
+				#this means a new product was loaded into the site
 				if sku not in self.sku_list:
-					print('hi')
+					print(f'{name} {sku} added to database')
 					self.c.execute("INSERT INTO kith (name, price, size, in_stock, sku, url, product_id)"
 								   " VALUES (? ,?, ?, ?, ?, ?, ?)", (name, price, size, in_stock, sku, url, product_id))
 					# p.pprint(self.c.fetchall())
