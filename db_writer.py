@@ -29,9 +29,9 @@ class title_output():
 				#get list of tuples
 				self.c.execute("SELECT sku FROM kith")
 				sku_db = self.c.fetchall()
-				self.c.execute("SELECT name FROM kith WHERE name = 'Kith Botanical Floral Williams III Hoodie - Nocturnal'")
+				self.c.execute("SELECT in_stock FROM kith WHERE name = ?",(name,))
 				name_db = (self.c.fetchall())
-				
+				print(name_db)
 				#iterate thru list of tuple & grab value inside tuple then append 2 list
 				#compare sku to tuples within list
 				#this code below can help us check for new arrivals to the site
