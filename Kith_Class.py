@@ -39,6 +39,7 @@ class kith():
 		#must append in stock to this list because if the last item of the variant is false it won't
 		#post the in stock items of that variant to the webhook
 		self.availability = []
+		self.restocked = []
 		############################# DEFINE PRODUCTS #####################################
 
 
@@ -112,21 +113,6 @@ class kith():
 					sizes += f'{self.size} - '
 				self.availability.append(self.in_stock)
 
-			for variant in product['variants']:
-				
-				self.c.execute("SELECT in_stock FROM kith WHERE name = ?", (self.name,))
-				db_stock = self.c.fetchall()
-				self.c.execute("SELECT sku FROM kith WHERE name = ?", (self.name,))
-				db_sku = self.c.fetchall()
-
-				for s in db_sku:
-					if s[0] == self.sku:
-						for stock in db_stock:
-							if stock[0] == 0 and self.in_stock == True:
-								self.size = variant['title']
-								await self.post_webhook(self.name, self.url, self.price, self.in_stock, self.size, self.img)
-
-				
 			# #CHECK FOR IN STOCK ITEMS
 			# #loop through variants of each product
 			# for variant in product['variants']:
@@ -142,6 +128,33 @@ class kith():
 			# 				await self.post_webhook(self.name, self.url, self.price, self.in_stock, sizes, self.img)
 			# 				self.checked.append(product['title'])
 			# 				await asyncio.sleep(1)
+
+			#check for restocks if item in self.checked
+			for variant in product['variants']:
+				
+				if self.name not in self.checked:
+					
+					self.c.execute("SELECT in_stock FROM kith WHERE name = ?", (self.name,))
+					db_stock = self.c.fetchall()
+					self.c.execute("SELECT sku FROM kith WHERE name = ?", (self.name,))
+					db_sku = self.c.fetchall()
+
+					#check for matching sku's and matching stock
+					for s in db_sku:
+						if s[0] == self.sku:
+							print(self.sku)
+							for stock in db_stock:
+								if stock[0] == 0 and self.in_stock == False:
+									print('yerrrrrr')
+									self.size = variant['title']
+									await self.post_webhook(self.name, self.url, self.price, self.in_stock, self.size, self.img)
+									self.restocked.append(self.sku)
+									# print(self.restocked)
+								# elif stock[0] == 0 and self.in_stock == True and self.sku in self.restocked:
+								# 	self.restocked.remove(self.sku)
+
+				
+			
 							
 
 

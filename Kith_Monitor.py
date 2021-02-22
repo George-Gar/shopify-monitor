@@ -12,7 +12,7 @@ async def tasks():
 # asyncio.run(tasks())
 
 loop = asyncio.get_event_loop()
-while True:
-	loop.run_until_complete(tasks())
-	time.sleep(8)
+# while True:
+loop.run_until_complete(tasks())
+time.sleep(8)
 	
