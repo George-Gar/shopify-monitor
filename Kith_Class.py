@@ -156,8 +156,8 @@ class kith():
 									await self.post_webhook(self.name, self.url, self.price, self.in_stock, self.size, self.img)
 									self.restocked.append(self.sku)
 								
-								elif stock[0] == 0 and self.in_stock == False and self.sku in self.restocked:
-									self.restocked.remove(self.sku)
+								# elif stock[0] == 0 and self.in_stock == False and self.sku in self.restocked:
+								# 	self.restocked.remove(self.sku)
 			await asyncio.sleep(1)
 				
 			
